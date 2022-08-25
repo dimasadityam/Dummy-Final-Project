@@ -1,25 +1,46 @@
-require("dotenv/config");
+const dotenv = require('dotenv');
+dotenv.config();
+// require("dotenv/config");
 const express = require("express");
 const cors = require("cors");
 const { join } = require("path");
+const bearerTokens = require('express-bearer-token')
 
+console.log(process.env.PORT)
 const PORT = process.env.PORT || 8000;
 const app = express();
-app.use(
-  cors({
-    origin: [
-      process.env.WHITELISTED_DOMAIN &&
-        process.env.WHITELISTED_DOMAIN.split(","),
-    ],
-  })
-);
+// app.use(
+//   cors({
+//     origin: [
+//       process.env.WHITELISTED_DOMAIN &&
+//       process.env.WHITELISTED_DOMAIN.split(","),
+//     ],
+//   })
+// );
 
+app.use(cors());
+app.use(bearerTokens());
 app.use(express.json());
+app.use(express.static('Public'));
+
+// DB Check Connection
+const { dbConf } = require('./Config/database');
+
+dbConf.getConnection((err, connection) => {
+  if (err) {
+    console.log("ERROR MySQL Connection", err.message, err.sqlMessage);
+  }
+
+  console.log(`Connected to MySQL Server: , ${connection.threadId}`);
+})
 
 //#region API ROUTES
 
 // ===========================
 // NOTE : Add your routes here
+const { userRouters } = require('./Routers');
+const { response } = require("express");
+app.use('/users', userRouters);
 
 app.get("/api", (req, res) => {
   res.send(`Hello, this is my API`);
