@@ -132,15 +132,17 @@ module.exports = {
         console.log("resultsLogin keep length =>", resultsLogin.length)
 
         if (resultsLogin.length) {
-          console.log("resultsLogin.length")
+          // console.log("resultsLogin.length")
 
-          let checkToken = await dbQuery(`SELECT token FROM tokenlist where idUser=${resultsLogin[0].idUser};`)
-          // let birthDateFE = resultsLogin[0].birthDate.toISOString().slice(0, 10).replace('T', ' ')
+          // let checkToken = await dbQuery(`SELECT token FROM tokenlist where idUser=${resultsLogin[0].idUser};`)
+          // // let birthDateFE = resultsLogin[0].birthDate.toISOString().slice(0, 10).replace('T', ' ')
+          // let { idUser, name, email, role, phone, gender, birthDate, profilePicture, isVerified } = resultsLogin[0]
+          // // console.log("token keepLogin undefined", resultsLogin[0]);
+          // // if (checkToken.length == 1) {
+
+          // let token = checkToken[0].token
           let { idUser, name, email, role, phone, gender, birthDate, profilePicture, isVerified } = resultsLogin[0]
-          // console.log("token keepLogin undefined", resultsLogin[0]);
-          // if (checkToken.length == 1) {
-
-          let token = checkToken[0].token
+          let token = createToken({ idUser, email, role, isVerified })
           return res.status(200).send({ ...resultsLogin[0], token });
           // }
         }
@@ -289,6 +291,28 @@ module.exports = {
       }
     } catch (err) {
       return next(err)
+    }
+  },
+  getTokens: async (req, res, next) => {
+    try {
+      let checkToken = await dbQuery(`SELECT token FROM tokenlist where idUser=${req.dataUser.idUser};`)
+      console.log("1 ==>", checkToken[0].token)
+      console.log("2 ==>", req.dataUser)
+      console.log("3 ==>", req.body)
+      if (req.body.token == checkToken[0].token) {
+        return res.status(200).send({
+          success: true,
+          message: "token valid"
+        });
+      } else {
+        return res.status(200).send({
+          success: false,
+          message: "invalid token"
+        });
+
+      }
+    } catch (error) {
+      return next(error)
     }
   },
   // login: async (req, res, next) => {
@@ -508,11 +532,11 @@ module.exports = {
           } else if (emailLogin[0].isVerified == "verified") {
             // generate token
             console.log("isVerified yang verified")
-            let birthDateFE = emailLogin[0].birthDate.toISOString().slice(0, 10).replace('T', ' ')
+            // let birthDateFE = emailLogin[0].birthDate.toISOString().slice(0, 10).replace('T', ' ')
             let { idUser, name, email, role, phone, gender, birthDate, profilePicture, addDate, isVerified } = emailLogin[0]
             let token = createToken({ idUser, email, role, addDate, isVerified })
 
-            return res.status(200).send({ ...emailLogin[0], birthDateFE, token });
+            return res.status(200).send({ ...emailLogin[0], token });
             // }
           } else {
             res.status(404).send({
@@ -555,7 +579,7 @@ module.exports = {
   edit: async (req, res) => {
     console.log("req.dataUsers Edit", req.dataUser)
     if (req.dataUser.idUser) {
-      // console.log("req.body Edit", req.body)
+      // EDIT EMAIL
       if (req.body.name == '' && req.body.gender == '' && req.body.birthDate == '') {
         let checkEmail = await dbQuery(`SELECT email FROM users WHERE email = '${req.body.email}'; `)
         if (checkEmail.length > 0) {
@@ -574,6 +598,7 @@ module.exports = {
           return res.status(200).send({ ...resultsLogin[0], token, success: true });
         }
       }
+      // EDIT NAME
       else if (req.body.email == '' && req.body.gender == '' && req.body.birthDate == '') {
         let edit = await dbQuery(`UPDATE users SET name='${req.body.name}' WHERE idUser=${req.dataUser.idUser};`)
         let resultsLogin = await dbQuery(`Select idUser, name, email, role, phone, gender, birthDate, profilePicture, addDate,
@@ -583,6 +608,7 @@ module.exports = {
         let token = createToken({ idUser, email, role, addDate, isVerified })
         return res.status(200).send({ ...resultsLogin[0], token, success: true });
       }
+      // EDIT GENDER
       else if (req.body.name == '' && req.body.email == '' && req.body.birthDate == '') {
         let edit = await dbQuery(`UPDATE users SET gender='${req.body.gender}' WHERE idUser=${req.dataUser.idUser};`)
         let resultsLogin = await dbQuery(`Select idUser, name, email, role, phone, gender, birthDate, profilePicture, addDate,
@@ -592,6 +618,7 @@ module.exports = {
         let token = createToken({ idUser, email, role, addDate, isVerified })
         return res.status(200).send({ ...resultsLogin[0], token, success: true });
       }
+      // EDIT BIRTHDATE
       else if (req.body.name == '' && req.body.email == '' && req.body.gender == '') {
         let edit = await dbQuery(`UPDATE users SET birthDate ='${req.body.birthDate} 10:00:00' WHERE idUser=${req.dataUser.idUser};`)
         let resultsLogin = await dbQuery(`Select idUser, name, email, role, phone, gender, birthDate, profilePicture, addDate,
@@ -602,6 +629,7 @@ module.exports = {
         let token = createToken({ idUser, email, role, addDate, isVerified })
         return res.status(200).send({ ...resultsLogin[0], birthDateFE, token, success: true });
       }
+      // EDIT GENDER & BIRTHDATE
       else if (req.body.name == '' && req.body.email == '') {
         let edit = await dbQuery(`UPDATE users SET gender ='${req.body.gender}',
           birthDate = '${req.body.birthDate} 10:00:00' WHERE idUser=${req.dataUser.idUser};`)
@@ -616,6 +644,7 @@ module.exports = {
           return res.status(200).send({ ...resultsLogin[0], birthDateFE, token });
         }
       }
+      // EDIT ALL
       else {
         let checkEmail = await dbQuery(`SELECT email FROM users WHERE email = '${req.body.email}'; `)
         if (checkEmail.length > 0) {
@@ -641,5 +670,46 @@ module.exports = {
         message: "Token expired"
       })
     }
+  },
+  profilePicture: (req, res) => {
+
+    // console.log('profilePicture')
+    const uploadFile = uploader('/Profile', 'PROFILE-PICTURE-').array('Profile', 5)
+
+    uploadFile(req, res, async (error) => {
+      try {
+        // upload file data harus menggunakan jason stringfy (merubah object jadi string) dan json parse
+        console.log('dataUser.iduser', req.dataUser.idUser)
+        if (req.dataUser.idUser) {
+          console.log('req body upload', req.body);
+          console.log('pengecekan file', req.files);
+
+          let { idUserLogin } = JSON.parse(req.body.data);
+
+          let imgData = req.files.map(val => {
+            return `${dbConf.escape(`${process.env.PORT_URL}/Profile/${val.filename}`)}`;
+          })
+          console.log("imgData", imgData.join(','))
+
+          let edit = await dbQuery(`UPDATE users SET profilePicture=${imgData.join(',')}
+          WHERE idUser = ${req.dataUser.idUser};`)
+          let resultsLogin = await dbQuery(`Select * FROM users
+          WHERE idUser = ${req.dataUser.idUser};`);
+
+          let { idUser, name, email, role, phone, gender, birthDate, profilePicture, isVerified } = resultsLogin[0]
+          let token = createToken({ idUser, name, email, role, isVerified })
+          return res.status(200).send({ ...resultsLogin[0], token, success: true });
+
+        } else {
+          return res.status(401).send({
+            success: false,
+            message: "Token expired"
+          })
+        }
+      } catch (error) {
+        req.files.forEach(val => fs.unlinkSync(`./Public/`))
+        console.log(error)
+      }
+    })
   },
 }

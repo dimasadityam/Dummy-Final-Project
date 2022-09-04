@@ -90,7 +90,7 @@ function ModalLogin(props) {
       }
     } catch (err) {
       newToast({
-        title: 'Login Tidak Berhasil.',
+        title: 'Login Tidak Berhasiltes.',
         description: err.response.data.message,
         status: 'error',
       })

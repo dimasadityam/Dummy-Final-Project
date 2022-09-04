@@ -15,6 +15,8 @@ import NotFoundPage from "./Pages/Users/404";
 import EditProfile from "./Pages/Users/EditProfile";
 import ResetPassword from "./Pages/Users/ResetPassword";
 import ChangePassword from "./Pages/Users/ChangePassword";
+import ProductList from "./Pages/Users/ProductList";
+import ProductDetail from "./Pages/Users/ProductDetail";
 
 function App() {
   const [message, setMessage] = useState("");
@@ -55,6 +57,8 @@ function App() {
                     <Route path='/cart' element={<Cart />} />
                     <Route path='/editProfile' element={<EditProfile />} />
                     <Route path='/changePassword' element={<ChangePassword />} />
+                    <Route path='/productList' element={<ProductList />} />
+                    <Route path='/productDetail' element={<ProductDetail />} />
                   </>
               }
             </>

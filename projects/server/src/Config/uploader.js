@@ -6,7 +6,7 @@ const fs = require('fs')
 module.exports = {
   uploader: (directory, fileNamePrefix) => {
     // mendefine lokasi penyimpanan utama
-    let defaultDir = './Public'
+    let defaultDir = './src/Public'
 
     // konfigurasi multer
     // diskStorage untuk menyimpan file
@@ -40,6 +40,7 @@ module.exports = {
     const fileFilter = (req, file, cb) => {
       // regex = reguler extention
       const extFilter = /\.(jpg|png|webp|svg|jpeg)/;
+      // const extFilter = /\.(jpg|png|webp|svg|jpeg)/;
 
       if (!file.originalname.toLowerCase().match(extFilter)) {
         return cb(new Error('Your file ext are denied', false))

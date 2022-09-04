@@ -45,7 +45,7 @@ const NavbarComponent = (props) => {
           console.log("resdata reverify",res.data.token)
           if (res.data.token){
               localStorage.setItem("tokenIdUser", res.data.token)
-              dispatch(loginAction(res.data))
+              // dispatch(loginAction(res.data))
               // setOpenToast(!openToast)
               // setToastMsg(`Resend Verification Success,
               // Please check your email`)
@@ -135,7 +135,7 @@ const NavbarComponent = (props) => {
                         <MenuList>
                           <MenuGroup title='Profile'>
                             <MenuItem onClick={()=> navigate("/editProfile")}>Edit Profile</MenuItem>
-                            <MenuItem>Add Address</MenuItem>
+                            <MenuItem onClick={()=> navigate("/productList")}>Product List</MenuItem>
                             <MenuItem onClick={()=> navigate("/changePassword")}>Change Password</MenuItem>
                           </MenuGroup>
                           <MenuDivider />

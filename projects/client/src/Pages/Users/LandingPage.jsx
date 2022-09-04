@@ -114,7 +114,7 @@ const LandingPage = (props) =>{
                     <Flex>
                       <Text class="h6b">Kategori</Text>
                       <Spacer/>
-                      <Link href='#' class="h6br">Semua Produk</Link>
+                      <Link href='/productList' class="h6br">Semua Produk</Link>
                     </Flex>
                     <div class="row">
                       <div class="col-4">
