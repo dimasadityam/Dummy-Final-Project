@@ -131,20 +131,24 @@ module.exports = {
         console.log("resultsLogin keep =>", resultsLogin[0])
         console.log("resultsLogin keep length =>", resultsLogin.length)
 
-        if (resultsLogin.length) {
-          // console.log("resultsLogin.length")
+        if (resultsLogin.length == 1) {
+          console.log("resultsLogin.length == 1")
+          if (resultsLogin[0].birthDate == null) {
+            console.log("resultsLogin[0].birthDate == kosong ")
 
-          // let checkToken = await dbQuery(`SELECT token FROM tokenlist where idUser=${resultsLogin[0].idUser};`)
-          // // let birthDateFE = resultsLogin[0].birthDate.toISOString().slice(0, 10).replace('T', ' ')
-          // let { idUser, name, email, role, phone, gender, birthDate, profilePicture, isVerified } = resultsLogin[0]
-          // // console.log("token keepLogin undefined", resultsLogin[0]);
-          // // if (checkToken.length == 1) {
+            let { idUser, name, email, role, phone, gender, birthDate, profilePicture, isVerified } = resultsLogin[0]
+            let token = createToken({ idUser, email, role, isVerified })
+            return res.status(200).send({ ...resultsLogin[0], token });
+          } else {
+            console.log("resultsLogin[0].birthDate == ada ")
 
-          // let token = checkToken[0].token
-          let { idUser, name, email, role, phone, gender, birthDate, profilePicture, isVerified } = resultsLogin[0]
-          let token = createToken({ idUser, email, role, isVerified })
-          return res.status(200).send({ ...resultsLogin[0], token });
-          // }
+            // let checkToken = await dbQuery(`SELECT token FROM tokenlist where idUser=${resultsLogin[0].idUser};`)
+            let birthDateFE = resultsLogin[0].birthDate.toISOString().slice(0, 10).replace('T', ' ')
+            let { idUser, name, email, role, phone, gender, birthDate, profilePicture, isVerified } = resultsLogin[0]
+            let token = createToken({ idUser, email, role, isVerified })
+            return res.status(200).send({ ...resultsLogin[0], birthDateFE, token });
+          }
+
         }
         else {
           res.status(404).send({
@@ -530,13 +534,23 @@ module.exports = {
             return res.status(200).send({ ...emailLogin[0], token });
             // }
           } else if (emailLogin[0].isVerified == "verified") {
-            // generate token
-            console.log("isVerified yang verified")
-            // let birthDateFE = emailLogin[0].birthDate.toISOString().slice(0, 10).replace('T', ' ')
-            let { idUser, name, email, role, phone, gender, birthDate, profilePicture, addDate, isVerified } = emailLogin[0]
-            let token = createToken({ idUser, email, role, addDate, isVerified })
+            if (emailLogin[0].birthDate == null) {
+              // generate token
+              console.log("isVerified yang verified == null")
+              let { idUser, name, email, role, phone, gender, birthDate, profilePicture, addDate, isVerified } = emailLogin[0]
+              let token = createToken({ idUser, email, role, addDate, isVerified })
 
-            return res.status(200).send({ ...emailLogin[0], token });
+              return res.status(200).send({ ...emailLogin[0], token });
+            } else {
+              // generate token
+              console.log("isVerified yang verified")
+              let { idUser, name, email, role, phone, gender, birthDate, profilePicture, addDate, isVerified } = emailLogin[0]
+              let birthDateFE = emailLogin[0].birthDate.toISOString().slice(0, 10).replace('T', ' ')
+              let token = createToken({ idUser, email, role, addDate, isVerified })
+              console.log("birthDateFE Login", birthDateFE)
+
+              return res.status(200).send({ ...emailLogin[0], birthDateFE, token });
+            }
             // }
           } else {
             res.status(404).send({

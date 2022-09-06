@@ -12,7 +12,6 @@ import { Flex, Box, Heading, Input, Image, Text, Divider, Spacer, ButtonGroup, B
   InputRightElement, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormLabel} from '@chakra-ui/react';
 
 function ModalLogin(props) {
-  // const { isOpen, onOpen, onClose } = useDisclosure()
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [show, setShow] = React.useState(false);
@@ -33,10 +32,8 @@ function ModalLogin(props) {
 
   const handleLogin =async (event) => {
     try {
-      // setDisable(!disable)
       setLoadingStat(true);
       if(inForm.email== "" || inForm.password== ""){
-        // alert("Fill in all form")
         newToast({
           title: 'Login Tidak Berhasil.',
           description: "Mohon isi semua data login.",
@@ -51,16 +48,15 @@ function ModalLogin(props) {
             password: inForm.password
           })
           if (res.data.role == "user") {
-            // console.log("RES DATA ROLE LOGIN", res.data.role)
             localStorage.setItem("tokenIdUser", res.data.token)
             dispatch(loginAction(res.data))
+            setShow(false)
             newToast({
               title: 'Login Berhasil.',
               description: "Selamat datang di medhika",
               status: 'success',
             })
             setLoadingStat(false);
-            // setDisable(!disable)
             navigate("/")
           } else {
             localStorage.setItem("tokenIdUser", res.data.token)
@@ -71,41 +67,27 @@ function ModalLogin(props) {
               status: 'success',
             })
             setLoadingStat(false);
-            // setDisable(!disable)
             navigate("/admin/dashboard")
           }
         } else {
-          // setDisable(!disable)
           newToast({
             title: 'Login Tidak Berhasil.',
             description: "Email tidak terdaftar, pastikan email yang anda isi benar dan sudah terdaftar",
             status: 'error',
           })
           setLoadingStat(false);
-          // setOpenToast(!openToast)
-          // setToastMsg(`Your username or email is not registered.
-          // please check again`)
-          // alert("username or email wrong")
         }
       }
     } catch (err) {
       newToast({
-        title: 'Login Tidak Berhasiltes.',
-        description: err.response.data.message,
+        title: 'Login Tidak Berhasil.',
+        description: 'Pastikan email dan password anda sesuai dengan yang terdaftar di medhika',
         status: 'error',
       })
       setLoadingStat(false);
-      // setDisable(!disable)
-      // setOpenToast(!openToast)
-      // setToastMsg(`${error.response.data.message}`)
-      // alert(error.response.data.message)
     }
   }
-  // const OverlayOne = () => (
-  //   <ModalOverlay
-  //     bgColor='#00000098'
-  //   />
-  // )
+
 
   console.log(inForm.email, inForm.password)
   return (
@@ -144,13 +126,15 @@ function ModalLogin(props) {
                     </Button>
                   </InputRightElement>
                 </InputGroup>
-                <Link href='/forgot' class="h6br">Forgot Password?</Link>
+                <div class="mt-2">
+                  <Link href='/forgot' class="h6br">Forgot Password?</Link>
+                </div>
             </FormControl>
           </ModalBody>
           <ModalFooter>
-            <Button isLoading={loadingStat} loadingText='Loading' class="btn-def me-3"
+            <Button isLoading={loadingStat} class="btn-def_second2 me-3"
               onClick={handleLogin}>Login</Button>
-            <Button class="btn-def_second2" onClick={props.onClose}>Cancel</Button>
+            <Button class="btn-def" onClick={props.onClose}>Cancel</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

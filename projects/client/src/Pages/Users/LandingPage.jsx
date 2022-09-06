@@ -1,5 +1,6 @@
 import React from "react";
 import Axios from "axios";
+import { API_URL } from "../../helper";
 import "../../Styles/Users/LandingPage.css";
 import VectorHeader from "../../Assets/DevImage/HeaderLandingPage.png";
 import logo from "../../Assets/DevImage/LogoMedhika.png";
@@ -19,9 +20,11 @@ import obat3 from "../../Assets/DevImage/Blackmores.jpg";
 import obat4 from "../../Assets/DevImage/Enervon-C.jpg";
 import obat5 from "../../Assets/DevImage/Derma.jpg";
 import NavbarComponent from "../../Components/Users/Navbar";
+import { getAllProductActions } from "../../Redux/Actions/productActions";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Modal from "../../Components/Users/ModalLogin";
+import ModalConversion from "../../Components/Admin/ModalConversion";
 import { useDisclosure, useToast } from '@chakra-ui/react';
 import { useToastHook } from "../../Components/CustomToast";
 import { Flex, Box, Heading, Input, Image, Text, Divider, Spacer, ButtonGroup, Button, Link, extendTheme } from '@chakra-ui/react';
@@ -29,13 +32,20 @@ import { Flex, Box, Heading, Input, Image, Text, Divider, Spacer, ButtonGroup, B
 
 const LandingPage = (props) =>{
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [show, setShow] = React.useState(false);
   const toast = useToast()
   const [loadingStat, setLoadingStat]=React.useState(false);
   const [currentToast, newToast]=useToastHook();
-  const {isVerified, users, name, profilePicture, token}=useSelector((state) => {
+
+  React.useEffect(()=>{
+    getAllProducts()
+  }, [])
+
+  const {isVerified, allProduct, users, name, profilePicture, token}=useSelector((state) => {
     return {
         isVerified:state.userReducers.isVerified,
+        allProduct:state.productReducers.allProduct,
         users:state.userReducers.users,
         name:state.userReducers.name,
         profilePicture:state.userReducers.profilePicture,
@@ -43,6 +53,23 @@ const LandingPage = (props) =>{
         }
     })
 
+    console.log("GET ALL PRODUCT", allProduct)
+    const getAllProducts =async() => {
+      try {
+        // let token = localStorage.getItem("tokenIdUser");
+        // console.log("TOKENN ALLPRODUCT JALAN", token)
+        // memeriksa adanya token
+        // if (token) {
+          let res = await Axios.get(`${API_URL}/product/getAllProduct`)
+          if (res.data) {
+            console.log("RES DATA GET ALL PRODUCTS", res.data)
+            dispatch(getAllProductActions(res.data))
+          }
+        // }
+      } catch (error) {
+        console.log(error)
+      }
+    }
     console.log("S T A T U S LandingPage", isVerified)
 
   const btnCart = async()=>{
@@ -76,6 +103,10 @@ const LandingPage = (props) =>{
       setLoadingStat(false)
     }
   }
+
+  const btnDetail = async()=>{
+    
+  }
   return (
     <>
       <div>
@@ -102,7 +133,8 @@ const LandingPage = (props) =>{
                         <Text class="h6" style={{marginTop:"15px", paddingLeft:"40px"}}>Tak perlu antre & obat akan langsung dikirimkan ke lokasi anda! Ukuran foto tidak lebih dari 1MB</Text>
                       </div>
                       <div class="col-4">
-                        <Button style={{marginRight:"0px", marginTop:"75px"}} class="btn-def_second">Unggah Resep</Button>
+                        <Button style={{marginRight:"0px", marginTop:"75px"}} class="btn-def_second" onClick={()=> setShow(!show)}>Unggah Resep</Button>
+                        <ModalConversion style={{color: "#000000"}} onClose={() => setShow(!show)} show={show} />
                       </div>
                     </div>
                   </Box>
@@ -172,15 +204,17 @@ const LandingPage = (props) =>{
                 <Box borderRadius={"10px"} width="100%" height="88%" boxShadow='lg' bg='#FFFFFF' marginTop={"50px"} paddingBottom={"10px"}>
                   <div class="row">
                     <div class="row d-flex justify-content-center">
-                      <Image src={obat1} width='85%' style={{marginLeft:"25px", marginTop:"5px"}}/>
-                      <Text class="h6b" style={{marginLeft:"35px"}}>Panadol</Text>
+                      <Image src={allProduct[2].productPicture} alt={"Foto Product"} width='85%' style={{marginLeft:"25px", marginTop:"5px"}}/>
+                      <Box noOfLines={1} >
+                        <Text class="h6b" style={{marginLeft:"35px"}}>{allProduct[2].productName}</Text>
+                      </Box>
                     </div>
                     <div class="row">
-                      <Text class="h6b" style={{marginTop:"65px", marginLeft:"20px"}}>Rp. 12.000 / Saset</Text>
+                      <Text class="h6b" style={{marginTop:"65px", marginLeft:"20px"}}>{allProduct[2].priceSale.toLocaleString()} / {allProduct[2].defaultUnit}</Text>
                     </div>
                   </div>
                   <div class="d-flex justify-content-center mt-2">
-                    <Button isLoading={loadingStat} loadingText='Loading' class="btn-rekom" onClick={btnCart}>Add To Cart</Button>
+                    <Button isLoading={loadingStat} loadingText='Loading' class="btn-rekom" onClick={btnCart}>Detail Product</Button>
                     <Modal style={{color: "#000000"}} onClose={() => setShow(!show)} show={show} />
                   </div>
                 </Box>
@@ -189,15 +223,17 @@ const LandingPage = (props) =>{
                 <Box borderRadius={"10px"} width="100%" height="88%" boxShadow='lg' bg='#FFFFFF' marginTop={"50px"} paddingBottom={"10px"}>
                   <div class="row">
                     <div class="row d-flex justify-content-center">
-                      <Image src={obat2} width='85%' style={{marginLeft:"25px", marginTop:"5px"}}/>
-                      <Text class="h6b" style={{marginLeft:"35px"}}>Decolgen</Text>
+                      <Image src={allProduct[4].productPicture} alt={"Foto Product"} width='85%' style={{marginLeft:"25px", marginTop:"5px"}}/>
+                      <Box noOfLines={1} >
+                        <Text class="h6b" style={{marginLeft:"35px"}}>{allProduct[4].productName}</Text>
+                      </Box>
                     </div>
                     <div class="row">
-                      <Text class="h6b" style={{marginTop:"65px", marginLeft:"20px"}}>Rp. 2.300 / Saset</Text>
+                      <Text class="h6b" style={{marginTop:"65px", marginLeft:"20px"}}>{allProduct[4].priceSale.toLocaleString()} / {allProduct[4].defaultUnit}</Text>
                     </div>
                   </div>
                   <div class="d-flex justify-content-center mt-2">
-                    <Button isLoading={loadingStat} loadingText='Loading' class="btn-rekom" onClick={btnCart}>Add To Cart</Button>
+                    <Button isLoading={loadingStat} loadingText='Loading' class="btn-rekom" onClick={btnCart}>Detail Product</Button>
                   </div>
                 </Box>
               </div>
@@ -205,15 +241,17 @@ const LandingPage = (props) =>{
                 <Box borderRadius={"10px"} width="100%" height="88%" boxShadow='lg' bg='#FFFFFF' marginTop={"50px"} paddingBottom={"10px"}>
                   <div class="row">
                     <div class="row d-flex justify-content-center">
-                      <Image src={obat3} width='85%' style={{marginLeft:"25px", marginTop:"5px"}}/>
-                      <Text class="h6b" style={{marginLeft:"35px"}}>Blackmores Multivitamin</Text>
+                      <Image src={allProduct[10].productPicture} alt={"Foto Product"} width='85%' style={{marginLeft:"25px", marginTop:"5px"}}/>
+                      <Box noOfLines={1} >
+                        <Text class="h6b" style={{marginLeft:"35px"}}>{allProduct[10].productName}</Text>
+                      </Box>
                     </div>
                     <div class="row">
-                      <Text class="h6b" style={{marginTop:"40px", marginLeft:"20px"}}>Rp. 550.000 / Botol</Text>
+                      <Text class="h6b" style={{marginTop:"65px", marginLeft:"20px"}}>{allProduct[10].priceSale.toLocaleString()} / {allProduct[10].defaultUnit}</Text>
                     </div>
                   </div>
                   <div class="d-flex justify-content-center mt-2">
-                    <Button isLoading={loadingStat} loadingText='Loading' class="btn-rekom" onClick={btnCart}>Add To Cart</Button>
+                    <Button isLoading={loadingStat} loadingText='Loading' class="btn-rekom" onClick={btnCart}>Detail Product</Button>
                   </div>
                 </Box>
               </div>
@@ -221,15 +259,17 @@ const LandingPage = (props) =>{
                 <Box borderRadius={"10px"} width="100%" height="88%" boxShadow='lg' bg='#FFFFFF' marginTop={"50px"} paddingBottom={"10px"}>
                   <div class="row">
                     <div class="row d-flex justify-content-center">
-                      <Image src={obat4} width='85%' style={{marginLeft:"25px", marginTop:"5px"}}/>
-                      <Text class="h6b" style={{marginLeft:"35px"}}>Enervon-C</Text>
+                      <Image src={allProduct[12].productPicture} alt={"Foto Product"} width='85%' style={{marginLeft:"25px", marginTop:"5px"}}/>
+                      <Box noOfLines={1} >
+                        <Text class="h6b" style={{marginLeft:"35px"}}>{allProduct[12].productName}</Text>
+                      </Box>
                     </div>
                     <div class="row">
-                      <Text class="h6b" style={{marginTop:"65px", marginLeft:"20px"}}>Rp. 35.000 / Saset</Text>
+                      <Text class="h6b" style={{marginTop:"65px", marginLeft:"20px"}}>{allProduct[12].priceSale.toLocaleString()} / {allProduct[12].defaultUnit}</Text>
                     </div>
                   </div>
                   <div class="d-flex justify-content-center mt-2">
-                    <Button isLoading={loadingStat} loadingText='Loading' class="btn-rekom" onClick={btnCart}>Add To Cart</Button>
+                    <Button isLoading={loadingStat} loadingText='Loading' class="btn-rekom" onClick={btnCart}>Detail Product</Button>
                   </div>
                 </Box>
               </div>
@@ -237,15 +277,17 @@ const LandingPage = (props) =>{
                 <Box borderRadius={"10px"} width="100%" height="88%" boxShadow='lg' bg='#FFFFFF' marginTop={"50px"} paddingBottom={"10px"}>
                   <div class="row">
                     <div class="row d-flex justify-content-center">
-                      <Image src={obat5} width='85%' style={{marginLeft:"25px", marginTop:"5px"}}/>
-                      <Text class="h6b" style={{marginLeft:"35px"}}>Derma AnGel Acne Patch Day</Text>
+                      <Image src={allProduct[14].productPicture} alt={"Foto Product"} width='85%' style={{marginLeft:"25px", marginTop:"5px"}}/>
+                      <Box noOfLines={1} >
+                        <Text class="h6b" style={{marginLeft:"35px"}}>{allProduct[14].productName}</Text>
+                      </Box>
                     </div>
                     <div class="row">
-                      <Text class="h6b" style={{marginTop:"40px", marginLeft:"20px"}}>Rp. 16.500 / Saset</Text>
+                      <Text class="h6b" style={{marginTop:"65px", marginLeft:"20px"}}>{allProduct[14].priceSale.toLocaleString()} / {allProduct[14].defaultUnit}</Text>
                     </div>
                   </div>
                   <div class="d-flex justify-content-center mt-2">
-                    <Button isLoading={loadingStat} loadingText='Loading' class="btn-rekom" onClick={btnCart}>Add To Cart</Button>
+                    <Button isLoading={loadingStat} loadingText='Loading' class="btn-rekom" onClick={btnCart}>Detail Product</Button>
                   </div>
                 </Box>
               </div>
