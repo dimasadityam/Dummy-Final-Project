@@ -3,10 +3,10 @@ import React from "react";
 import { API_URL } from "../../helper";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from "react-router-dom";
-import { useDisclosure, useToast, useEditableControls, Textarea, Spacer, Divider } from '@chakra-ui/react';
+import { useDisclosure, useToast, useEditableControls } from '@chakra-ui/react';
 import { loginAction } from "../../Redux/Actions/userActions";
 import { Text, Button, Input, Box, Image, InputGroup, Flex, IconButton, Editable, EditablePreview, EditableInput,
-          ButtonGroup, Select, useMediaQuery, FormControl, FormLabel, Switch, Checkbox, InputLeftAddon} from '@chakra-ui/react';
+          ButtonGroup, Select, useMediaQuery, FormControl, FormLabel, Textarea, Checkbox, Spacer, Divider} from '@chakra-ui/react';
 import { FaRegEdit } from 'react-icons/fa';
 import { HiCheck } from 'react-icons/hi';
 import { IoMdAdd } from 'react-icons/io';
@@ -16,19 +16,19 @@ import { useToastHook } from "../../Components/CustomToast";
 import { getAddress, getAddressActions } from "../../Redux/Actions/addressActions";
 import ModalAddress from "../../Components/Users/ModalAddress";
 import { getProvinceRajaOngkir, getProvinceActions2 } from "../../Redux/Actions/getProvinceActions";
-import { getCityRajaOngkir } from "../../Redux/Actions/getCityActions";
+import { getCityRajaOngkir, getCityActions2 } from "../../Redux/Actions/getCityActions";
 
 const EditProfile=(props)=>{
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const toast = useToast()
+  const toast = useToast();
+  const [isLargerThan1280] = useMediaQuery('(min-width: 1280px)');
+  const [isLargerThan720] = useMediaQuery('(min-width: 720px)');
   const [loadingStat, setLoadingStat]=React.useState(false);
   const [currentToast, newToast]=useToastHook();
   const [show, setShow] = React.useState(false);
   const [utama, setUtama] = React.useState(false);
   const [dataID, setDataID] = React.useState(0);
-  const provRef = React.useState(null);
-  // const provRef = useRef(null)
 
   React.useEffect(()=>{
     dispatch(getAddress())
@@ -36,8 +36,7 @@ const EditProfile=(props)=>{
     getProvinceRajaOngkir2()
   }, [])
 
-
-  const {address, phone, email, gender, birthDateFE, idUser, name, profilePicture, token, getProvince, getProvince2, getCity}=useSelector((state) => {
+  const {address, phone, email, gender, birthDateFE, idUser, name, profilePicture, token, getProvince, getProvince2, getCity, getCity2}=useSelector((state) => {
     return {
         address:state.addressReducers.address,
         phone:state.userReducers.phone,
@@ -50,53 +49,345 @@ const EditProfile=(props)=>{
         token:state.userReducers.token,
         getProvince:state.getProvinceReducers.getProvince,
         getProvince2:state.getProvinceReducers.getProvince2,
-        getCity:state.getCityReducers.getCity
+        getCity:state.getCityReducers.getCity,
+        getCity2:state.getCityReducers.getCity2
         }
-    })
+    });
 
-  const [getCityOn, setGetCityOn]=React.useState(false)
-  const [addLabel, setAddLabel]=React.useState("")
-  const [addAlamat, setAddAlamat]=React.useState("")
-  const [addProvinsi, setAddProvinsi]=React.useState("")
-  const [addProvinsiId, setAddProvinsiId]=React.useState(0)
-  const [addKota, setAddKota]=React.useState("")
-  const [addKodePos, setAddKodePos]=React.useState("")
-  const [addPenerima, setAddPenerima]=React.useState("")
-  const [addTelfon, setAddTelfon]=React.useState("")
-  const [addUtama, setAddUtama]=React.useState(false)
-  const [nameEdit, setNameEdit]=React.useState("")
-  const [emailEdit, setEmailEdit]=React.useState("")
-  const [genderEdit, setGenderEdit]=React.useState("")
-  const [birthDateEdit, setBirthDateEdit]=React.useState("")
-  const [isLargerThan1280] = useMediaQuery('(min-width: 1280px)')
+  const [addLabel, setAddLabel]=React.useState("");
+  const [addAlamat, setAddAlamat]=React.useState("");
+  const [addProvinsi, setAddProvinsi]=React.useState("");
+  const [addProvinsiId, setAddProvinsiId]=React.useState(0);
+  const [addKota, setAddKota]=React.useState("");
+  const [addKotaId, setAddKotaId]=React.useState(0);
+  const [addKodePos, setAddKodePos]=React.useState("");
+  const [addPenerima, setAddPenerima]=React.useState("");
+  const [addTelfon, setAddTelfon]=React.useState("");
+  const [addUtama, setAddUtama]=React.useState(false);
+  const [nameEdit, setNameEdit]=React.useState("");
+  const [emailEdit, setEmailEdit]=React.useState("");
+  const [genderEdit, setGenderEdit]=React.useState("");
+  const [birthDateEdit, setBirthDateEdit]=React.useState("");
   const inputFile = React.useRef(null);
-  const [previewPost, setPreviewPost] = React.useState(false)
-  const [editProfile, setEditProfile] = React.useState(false)
+  const [previewPost, setPreviewPost] = React.useState(false);
+  const [editProfile, setEditProfile] = React.useState(false);
   const [addAddress, setAddAddress] = React.useState(false)
-  const [primaryAddress, setPrimaryAddress] = React.useState(false)
-  const [editAddress, setEditAddress] = React.useState(false)
   const [file, setFile] = React.useState();
   const [imageProfile, setImageProfile] = React.useState([]);
-  // const [emailProfile, setEmailProfile]=React.useState(email)
-
-  // const onSelect = () => {
-  //   kabAllAction({ provId: provRef.current.value })
-  // }
 
   // console.log("username", usernameProfile, "fullname",fullnameProfile, "bio", bioProfile)
   // console.log("fullname",fullnameProfile != "")
   // console.log("username",usernameProfile != "")
-  console.log("GET PROVINCE 2 ==>>", getProvince2)
-  console.log("GET PROVINCE RAJA ONGKIR ==>>", getProvince)
-  // console.log("check imgPosting edit foto",imgPosting)
-  // alert(addUtama)
+  // console.log("bio",bioProfile != "")
+  console.log("check previewPost", previewPost)
   
-  const getProvinceRajaOngkir2 = async() => {
+  const handleProfilePicture = async()=>{
+    try {
+      console.log("check idUser", idUser);
+      // alert('check')
+      let idUserLogin = idUser;
+      let formData = new FormData();
+        let data = {
+          idUserLogin
+        }
+      console.log('data edit foto', data);
+      // menambahkan data kedalam formData yang harus pake JSON.stringify
+      formData.append('data', JSON.stringify(data));
+  
+      // menambahkan images
+      imageProfile.forEach(val=>formData.append('Profile', val));
+      let token = localStorage.getItem("tokenIdUser");
+
+      let res = await Axios.patch(`${API_URL}/users/profilePicture`, formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (res.data.token) {
+        localStorage.setItem("tokenIdUser", res.data.token);
+        dispatch(loginAction(res.data));
+        setLoadingStat(false);
+      }
+  } catch (error) {
+    newToast({
+      title: 'Edit Profile Tidak Berhasil.',
+      description: 'Profile Picture Max Size 1MB',
+      status: 'error',
+    });
+    setFile(profilePicture);
+    setLoadingStat(false);
+  }
+}
+
+console.log("EMAIL EDIT CHECK", emailEdit);
+const handleEditProfile=async()=>{
+  try {
+    setLoadingStat(true);
+    if(previewPost==true){
+          console.log("JALUR true jalan");
+          if(nameEdit != "" || emailEdit !="" || genderEdit !="" || birthDateEdit !=""){
+            // if (emailEdit !=""){
+              console.log("EMAILEDIT KE ISI JALAN")
+              if (emailEdit.includes("@")){
+                console.log("previewPost true 1");
+                let token = localStorage.getItem("tokenIdUser");
+                let res = await Axios.patch(`${API_URL}/users/edit`, {
+                  name: nameEdit,
+                  email: emailEdit,
+                  gender: genderEdit,
+                  birthDate: birthDateEdit
+                }, {
+                  headers: {
+                    'Authorization': `Bearer ${token}`
+                  }
+                });
+                if (res.data) {
+                  {handleProfilePicture()};
+                  localStorage.setItem("tokenIdUser", res.data.token);
+                  dispatch(loginAction(res.data));
+                  setEditProfile(!editProfile);
+                  setNameEdit("");
+                  setEmailEdit("");
+                  setGenderEdit("");
+                  setBirthDateEdit("");
+                  newToast({
+                    title: 'Edit Profile Berhasil.',
+                    description: 'Data pada profile anda sudah terupdate.',
+                    status: 'success',
+                  });
+                  setLoadingStat(false);
+                }
+              } else if (emailEdit == ""){
+                console.log("previewPost true 2");
+                let token = localStorage.getItem("tokenIdUser");
+                let res = await Axios.patch(`${API_URL}/users/edit`, {
+                  name: nameEdit,
+                  email: emailEdit,
+                  gender: genderEdit,
+                  birthDate: birthDateEdit
+                }, {
+                  headers: {
+                    'Authorization': `Bearer ${token}`
+                  }
+                });
+                if (res.data) {
+                  {handleProfilePicture()};
+                  localStorage.setItem("tokenIdUser", res.data.token);
+                  dispatch(loginAction(res.data));
+                  setEditProfile(!editProfile);
+                  setNameEdit("");
+                  setGenderEdit("");
+                  setBirthDateEdit("");
+                  newToast({
+                    title: 'Edit Profile Berhasil.',
+                    description: 'Data pada profile anda sudah terupdate.',
+                    status: 'success',
+                  });
+                  setLoadingStat(false);
+                }
+              } 
+              else {
+                newToast({
+                  title: 'Registrasi Tidak Berhasil.',
+                  description: 'Format email salah, mohon memasukan sesuai format email',
+                  status: 'error',
+                })
+                setLoadingStat(false)
+              }
+          } else {
+            console.log("JALUR true 2");
+              {handleProfilePicture()};
+              setEditProfile(!editProfile);
+          }
+        } else {
+          console.log("JALUR false JALANNN");
+          if(nameEdit == "" && emailEdit=="" && genderEdit =="" && birthDateEdit ==""){
+            newToast({
+              title: 'Edit Profile Tidak Berhasil.',
+              description: 'Data user tidak ada yang dirubah',
+              status: 'error',
+            })
+            setLoadingStat(false)
+          }
+          else if(nameEdit != "" || emailEdit !="" || genderEdit !="" || birthDateEdit !=""){
+            // if (emailEdit !=""){
+              console.log("EMAILEDIT KE ISI JALAN")
+              if (emailEdit.includes("@")){
+                console.log("previewPost false 1");
+                let token = localStorage.getItem("tokenIdUser");
+                let res = await Axios.patch(`${API_URL}/users/edit`, {
+                  name: nameEdit,
+                  email: emailEdit,
+                  gender: genderEdit,
+                  birthDate: birthDateEdit
+                }, {
+                  headers: {
+                    'Authorization': `Bearer ${token}`
+                  }
+                });
+                if (res.data) {
+                  // {handleProfilePicture()};
+                  localStorage.setItem("tokenIdUser", res.data.token);
+                  dispatch(loginAction(res.data));
+                  setEditProfile(!editProfile);
+                  setNameEdit("");
+                  setEmailEdit("");
+                  setGenderEdit("");
+                  setBirthDateEdit("");
+                  newToast({
+                    title: 'Edit Profile Berhasil.',
+                    description: 'Data pada profile anda sudah terupdate.',
+                    status: 'success',
+                  });
+                  setLoadingStat(false);
+                }
+              } else if (emailEdit ==""){
+                console.log("previewPost false 2");
+                let token = localStorage.getItem("tokenIdUser");
+                let res = await Axios.patch(`${API_URL}/users/edit`, {
+                  name: nameEdit,
+                  email: emailEdit,
+                  gender: genderEdit,
+                  birthDate: birthDateEdit
+                }, {
+                  headers: {
+                    'Authorization': `Bearer ${token}`
+                  }
+                });
+                if (res.data) {
+                  // {handleProfilePicture()};
+                  localStorage.setItem("tokenIdUser", res.data.token);
+                  dispatch(loginAction(res.data));
+                  setEditProfile(!editProfile);
+                  setNameEdit("");
+                  setGenderEdit("");
+                  setBirthDateEdit("");
+                  newToast({
+                    title: 'Edit Profile Berhasil.',
+                    description: 'Data pada profile anda sudah terupdate.',
+                    status: 'success',
+                  });
+                  setLoadingStat(false);
+                }
+              } 
+              else {
+                newToast({
+                  title: 'Registrasi Tidak Berhasil.',
+                  description: 'Format email salah, mohon memasukan sesuai format email',
+                  status: 'error',
+                })
+                setLoadingStat(false)
+              }
+          } 
+        }
+      } catch (err) {
+        newToast({
+          title: 'Edit Profile Tidak Berhasil.',
+          description: err.response.data.message,
+          status: 'error',
+        });
+        setLoadingStat(false);
+      }
+    }
+    
+    const handleAddAddress =async(props)=>{
+      try {
+        setLoadingStat(true)
+        if (addLabel =="" || addAlamat=="" || getProvince2==undefined || getCity2==undefined || addPenerima=="" || addTelfon=="" || addKodePos==""){
+          newToast({
+            title: 'Tambah Alamat Tidak Berhasil.',
+            description: 'Mohon isi semua data yang bertanda bintang *',
+            status: 'error',
+          })
+          setLoadingStat(false)
+        } else if (addTelfon.length < 11){
+          newToast({
+            title: 'Tambah Alamat Tidak Berhasil.',
+            description: 'Isi nomor telfon penerima dengan nomor telfon aktif',
+            status: 'error',
+          })
+          setLoadingStat(false)
+        } else {
+            let token = localStorage.getItem("tokenIdUser");
+            let res = await Axios.post(`${API_URL}/address/addAddress`, {
+              label: addLabel,
+              address: addAlamat,
+              province: getProvince2,
+              provinceid: addProvinsiId,
+              city: getCity2,
+              cityid: addKotaId,
+              postalCode: addKodePos,
+              receiverName: addPenerima,
+              receiverPhone: addTelfon,
+              isDefaultAddress: addUtama
+            }, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            })
+            // console.log("res.data registerUser", res.data)
+            if (res.data) {
+              newToast({
+                title: 'Tambah Alamat Berhasil.',
+                description: 'Anda bisa atur alamat utama anda',
+                status: 'success',
+              })
+              // console.log("res.data FE ADDRESS", res.data)
+              dispatch(getAddressActions(res.data))
+              setAddAddress(!addAddress)
+              setAddUtama(false)
+              // console.log("setAddUtama===>", addUtama)
+              setLoadingStat(false)
+            }
+        }    
+      } catch (err) {
+        newToast({
+          title: 'Tambah Alamat Tidak Berhasil.',
+          description: err.response.data.message,
+          status: 'error',
+        })
+        setLoadingStat(false)
+      }
+    }
+
+    const handleCity = async(e) => {
+      try {
+        console.log("====addProvinsiId func", addProvinsiId)
+        if (addProvinsiId > 0){
+          let a = addProvinsiId
+          // let b = !getCityOn
+          let city = getCityRajaOngkir(a)
+          dispatch(city)
+          if (getCity){
+            setAddKotaId(e.target.value)
+            {getProvinceRajaOngkir2()}
+          }
+          // setGetCityOn(!getCityOn)
+        } else {
+          alert("else")
+        }
+      } catch (error) {
+        alert(error)
+      }
+    }
+
+    const handleCityName = async(e) => {
+      try {
+        console.log("====addProvinsiId func", addKotaId)
+        if (addKotaId > 0){
+          {getCityRajaOngkir2()}
+        } else {
+          alert("else")
+        }
+      } catch (error) {
+        alert(error)
+      }
+    }
+
+    const getProvinceRajaOngkir2 = async() => {
       try {
         console.log("PROVINCE_ID ACTIONS 2", addProvinsiId)
-        // let token = localStorage.getItem("tokenIdUser");
-        // console.log("TOKENN PROVINCE 2 RAJAONGKIR", token)
-        // memeriksa adanya token
         if (addProvinsiId > 0) {
           console.log("PROVINCE2 JALANNN")
           let res = await Axios.get(`${API_URL}/rajaOngkir/getProvince2`, {
@@ -105,209 +396,34 @@ const EditProfile=(props)=>{
             }
           })
           if (res.data) {
-            console.log("RES DATA GET PROVINCE RAJAONGKIR", res.data)
-            dispatch(getProvinceActions2(res.data))
+            console.log("RES DATA GET PROVINCE RAJAONGKIR", res.data.namaProvinsi[0])
+            dispatch(getProvinceActions2(res.data.namaProvinsi[0]))
           }
         }
       } catch (error) {
         console.log(error)
       }
   }
-
-  const handleAddAddress =async(props)=>{
-    try {
-      setLoadingStat(true)
-      if (addLabel =="" || addAlamat=="" || getProvince2.namaProvinsi==undefined || addKota=="" || addPenerima=="" || addTelfon==""){
-        newToast({
-          title: 'Tambah Alamat Tidak Berhasil.',
-          description: 'Mohon isi semua data yang bertanda bintang *',
-          status: 'error',
-        })
-        setLoadingStat(false)
-      } else if (addTelfon.length < 11){
-        newToast({
-          title: 'Tambah Alamat Tidak Berhasil.',
-          description: 'Isi nomor telfon penerima dengan nomor telfon aktif',
-          status: 'error',
-        })
-        setLoadingStat(false)
-      } else {
-          let token = localStorage.getItem("tokenIdUser");
-          let res = await Axios.post(`${API_URL}/address/addAddress`, {
-            label: addLabel,
-            address: addAlamat,
-            province: getProvince2.namaProvinsi[0],
-            city: addKota,
-            postalCode: addKodePos,
-            receiverName: addPenerima,
-            receiverPhone: addTelfon,
-            isDefaultAddress: addUtama
-          }, {
+    const getCityRajaOngkir2 = async() => {
+      try {
+        console.log("CITY_ID ACTIONS 2", addKotaId)
+        if (addKotaId > 0) {
+          console.log("CITY2 JALANNN")
+          let res = await Axios.get(`${API_URL}/rajaOngkir/getCity2`, {
             headers: {
-              'Authorization': `Bearer ${token}`
+              provinceid: addProvinsiId,
+              cityid: addKotaId
             }
           })
-          // console.log("res.data registerUser", res.data)
           if (res.data) {
-            newToast({
-              title: 'Tambah Alamat Berhasil.',
-              description: 'Anda bisa atur alamat utama anda',
-              status: 'success',
-            })
-            // console.log("res.data FE ADDRESS", res.data)
-            dispatch(getAddressActions(res.data))
-            setAddAddress(!addAddress)
-            setAddUtama(false)
-            // console.log("setAddUtama===>", addUtama)
-            setLoadingStat(false)
+            console.log("RES DATA GET CITY RAJAONGKIR", res.data.namaKota[0])
+            dispatch(getCityActions2(res.data.namaKota[0]))
           }
-      }    
-    } catch (err) {
-      newToast({
-        title: 'Tambah Alamat Tidak Berhasil.',
-        description: err.response.data.message,
-        status: 'error',
-      })
-      setLoadingStat(false)
-    }
-  }
-
-  const handleProfilePicture = async()=>{
-    try {
-      console.log("check idUser", idUser)
-      // alert('check')
-      let idUserLogin = idUser
-      let formData = new FormData()
-        let data = {
-          idUserLogin
         }
-      console.log('data edit foto', data)
-      // menambahkan data kedalam formData yang harus pake JSON.stringify
-      formData.append('data', JSON.stringify(data));
-  
-      // menambahkan images
-      imageProfile.forEach(val=>formData.append('Profile', val));
-      let token = localStorage.getItem("tokenIdUser");
-      // console.log("resPosting edit foto", resPosting.data)
-      // console.log("token edit foto", token)
-      // alert('token')
-      let res = await Axios.patch(`${API_URL}/users/profilePicture`, formData, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      // let a = formData
-      // console.log("resPosting edit foto", res.data)
-      // alert('edit foto profile ke BE')
-      if (res.data.token) {
-        // console.log("RES DATA TOKEN LOGIN", res.data.token)
-        localStorage.setItem("tokenIdUser", res.data.token)
-        dispatch(loginAction(res.data.token))
+      } catch (error) {
+        console.log(error)
       }
-      // dispatch(getPostings())
-  } catch (error) {
-    console.log(error)
   }
-}
-console.log("previewPost", previewPost)
-console.log("==>",nameEdit,"==>", emailEdit,"==>", genderEdit,"==>", birthDateEdit)
-const handleEditProfile=async()=>{
-  try {
-    setLoadingStat(true)
-    if(previewPost==true){
-          console.log("JALUR true jalan")
-          
-          if(nameEdit != "" || emailEdit !="" || genderEdit !="" || birthDateEdit !=""){
-            console.log("previewPost true 1")
-            let token = localStorage.getItem("tokenIdUser");
-            let res = await Axios.patch(`${API_URL}/users/edit`, {
-              name: nameEdit,
-              email: emailEdit,
-              gender: genderEdit,
-              birthDate: birthDateEdit
-            }, {
-              headers: {
-                'Authorization': `Bearer ${token}`
-              }
-            })
-            if (res.data.token) {
-              {handleProfilePicture()}
-              // console.log("RES DATA TOKEN LOGIN", res.data.token)
-              localStorage.setItem("tokenIdUser", res.data.token)
-              dispatch(loginAction(res.data))
-              setEditProfile(!editProfile)
-              newToast({
-                title: 'Edit Profile Berhasil.',
-                description: 'Data pada profile anda sudah terupdate.',
-                status: 'success',
-              })
-              setLoadingStat(false)
-            }
-          } else {
-            console.log("JALUR true 2")
-            let token = localStorage.getItem("tokenIdUser");
-            let res = await Axios.patch(`${API_URL}/users/edit`, {
-              name: nameEdit,
-              email: emailEdit,
-              gender: genderEdit,
-              birthDate: birthDateEdit
-            }, {
-              headers: {
-                'Authorization': `Bearer ${token}`
-              }
-            })
-            if (res.data.token) {
-              {handleProfilePicture()}
-              // console.log("RES DATA TOKEN LOGIN", res.data.token)
-              localStorage.setItem("tokenIdUser", res.data.token)
-              dispatch(loginAction(res.data))
-              setEditProfile(!editProfile)
-              newToast({
-                title: 'Edit Profile Berhasil.',
-                description: 'Data pada profile anda sudah terupdate.',
-                status: 'success',
-              })
-              setLoadingStat(false)
-            }
-            // {handleProfilePicture()}
-          }
-        } else {
-          console.log("JALUR false 1")
-          if(nameEdit != "" || emailEdit !="" || genderEdit !="" || birthDateEdit !=""){
-            let token = localStorage.getItem("tokenIdUser");
-            let res = await Axios.patch(`${API_URL}/users/edit`, {
-              name: nameEdit,
-              email: emailEdit,
-              gender: genderEdit,
-              birthDate: birthDateEdit
-            }, {
-              headers: {
-                'Authorization': `Bearer ${token}`
-              }
-            })
-            if (res.data) {
-              console.log("RES DATA EDIT PROFILE", res.data)
-              localStorage.setItem("tokenIdUser", res.data.token)
-              dispatch(loginAction(res.data))
-              newToast({
-                title: 'Edit Profile Berhasil.',
-                description: 'Data pada profile anda sudah terupdate.',
-                status: 'success',
-              })
-              setLoadingStat(false)
-              setEditProfile(!editProfile)
-            }
-          } 
-        }
-      } catch (err) {
-        newToast({
-          title: 'Edit Profile Tidak Berhasil.',
-          description: err.response.data.message,
-          status: 'error',
-        })
-        setLoadingStat(false)
-      }
-    } 
 
   const onButtonClick = () => {
     inputFile.current.click();
@@ -316,53 +432,17 @@ const handleEditProfile=async()=>{
 
   const handleFileUpload = (e) => {  
     setImageProfile([e.target.files[0]]);
-    setFile(URL.createObjectURL(e.target.files[0]))
+    setFile(URL.createObjectURL(e.target.files[0]));
   };
   
   const handleCancel = () => {
     setEditProfile(!editProfile);
-    setPreviewPost(false);
-    setFile(null)
     setEmailEdit("");
+    setNameEdit("");
+    setGenderEdit("");
+    setBirthDateEdit("");
+    setFile(profilePicture);
   };
-
-  const handleProvinsi = async(e) => {
-    try {
-      setAddProvinsiId(e.target.value)
-      console.log("===addProvinsi func", addProvinsiId)
-      if (addProvinsiId > 0){
-        let a = addProvinsiId
-        let city = getCityRajaOngkir(a)
-        dispatch(city)
-      } else {
-        alert("else")
-      }
-    } catch (error) {
-      alert(error)
-    }
-  }
-  
-  const handleCity = async(e) => {
-    try {
-      console.log("====addProvinsiId func", addProvinsiId)
-      if (addProvinsiId > 0){
-        let a = addProvinsiId
-        // let b = !getCityOn
-        let city = getCityRajaOngkir(a)
-        dispatch(city)
-        if (getCity){
-          setAddKota(e.target.value)
-          {getProvinceRajaOngkir2()}
-        }
-        // setGetCityOn(!getCityOn)
-      } else {
-        alert("else")
-      }
-    } catch (error) {
-      alert(error)
-    }
-  }
-
 
   const printPrimaryAddress=()=>{
     return address.map((value ,index) =>{
@@ -419,12 +499,8 @@ const handleEditProfile=async()=>{
     })
   }
 
-
-  // console.log("add province2.namaprovinsi", getProvince2.namaProvinsi)
-  // console.log("cek getProvinsi Raja Ongkir", getProvince)
-  console.log("ADD KOTAAAA", addKota, "provinsi", addProvinsi, "provinsiID", addProvinsiId)
-  console.log("addAddress", addLabel, addAlamat, getProvince2.namaProvinsi, addKota, addKodePos, addUtama)
-  // console.log("Address dari reducers ==>", address)
+  console.log("check ADD ADDRESS BARU", addLabel, addAlamat, getProvince2, addProvinsiId, getCity2, addKotaId, addPenerima, addTelfon, addKodePos)
+  // console.log("check users", gender, birthDateFE, editProfile)
   // console.log("edit value", nameEdit, emailEdit, genderEdit, birthDateEdit)
 
   return (
@@ -439,92 +515,90 @@ const handleEditProfile=async()=>{
       <NavbarComponent/>
     </Box>
       <div class="container">
+      {
+        editProfile == false ?
+        <>
+        <div class="row mt-5">
+          <div class="d-flex justify-content-center">
+            <img src={profilePicture} alt="Profile Picture" style={{ width:"15%", borderRadius:"50%"}} />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4"></div>
+          <div class="col-md-4">
+            <div class="rounded-4 mt-5" style={{backgroundColor:"#edf0f4", paddingTop:"20px", cursor:"pointer"}}>
+              <Flex ms={"40px"}>
+                <Text class="h6b text-uppercase">{name}</Text>
+              </Flex>
+              <Flex mt={"10px"} ms={"40px"}>
+                <Text class="h6">{email}</Text>
+              </Flex>
+              <Flex mt={"10px"} ms={"40px"}>
+                <Text class="h6">{gender}</Text>
+              </Flex>
+              <Flex mt={"10px"} ms={"40px"}>
+                <Text class="h6">{birthDateFE}</Text>
+              </Flex>
+              <Box mt={"10px"} ms={"40px"} pb={"20px"}>
+                <FaRegEdit shadow={"md"} color="#DE1B51" size={'20px'} onClick={() => setEditProfile(!editProfile)}/>
+              </Box>
+            </div>
+          </div>
+          <div class="col-md-4"></div>
+        </div>
+        </>
+      :
+        <>
+        <div class="row mt-5">
+          <div class="d-flex justify-content-center">
+            <input
+              style={{ display: "none" }}
+              ref={inputFile}
+              onChange={(e)=> handleFileUpload (e)}
+              type="file"
+            />
             {
-              editProfile == false ?
-              <>
-              <div class="row mt-5">
-                <div class="d-flex justify-content-center">
-                  <img src={profilePicture} alt="Profile Picture" style={{ width:"15%", borderRadius:"50%"}} />
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-4"></div>
-                <div class="col-md-4">
-                  <div class="rounded-4 mt-5" style={{backgroundColor:"#edf0f4", paddingTop:"20px", cursor:"pointer"}}>
-                    <Flex ms={"40px"}>
-                      <Text class="h6b text-uppercase">{name}</Text>
-                    </Flex>
-                    <Flex mt={"10px"} ms={"40px"}>
-                        <Text class="h6">{email}</Text>
-                    </Flex>
-                    <Flex mt={"10px"} ms={"40px"}>
-                        <Text class="h6">{gender}</Text>
-                    </Flex>
-                    <Flex mt={"10px"} ms={"40px"}>
-                        <Text class="h6">{birthDateFE}</Text>
-                    </Flex>
-                    <Box mt={"10px"} ms={"40px"} pb={"20px"}>
-                      <FaRegEdit shadow={"md"} color="#DE1B51" size={'20px'} onClick={() => setEditProfile(!editProfile)}/>
-                    </Box>
-                    {/* <IconButton shadow={"md"} ms={"40px"} size='sm' icon={<FaRegEdit color="#DE1B51" size={'20px'} />} onClick={() => setEditProfile(!editProfile)} /> */}
-                  </div>
-                </div>
-                <div class="col-md-4"></div>
-              </div>
-            </>
+              previewPost == false ?
+              <img src={profilePicture} onDoubleClick={onButtonClick}
+                alt="Profile Picture" style={{cursor:"pointer", width:"15%", borderRadius:"50%"}} />
             :
-            <>
-              <div class="row mt-5">
-                <div class="d-flex justify-content-center">
-                  <input
-                    style={{ display: "none" }}
-                    // accept=".zip,.rar"
-                    ref={inputFile}
-                    onChange={(e)=> handleFileUpload (e)}
-                    type="file"
-                  />
-                  {
-                    previewPost == false ?
-                    <img src={profilePicture} onDoubleClick={onButtonClick}
-                      alt="Profile Picture" style={{cursor:"pointer", width:"15%", borderRadius:"50%"}} />
-                  :
-                    <img src={file} onDoubleClick={onButtonClick}
-                      alt="Profile Picture" style={{cursor:"pointer", width:"15%", borderRadius:"50%"}} />
-                    }
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-4"></div>
-                <div class="col-md-4">
-                  <div class="rounded-4 mt-5" style={{backgroundColor:"#edf0f4", paddingTop:"20px"}}>
-                    <Flex ms={"40px"} me={"40px"}>
-                    <Input bgColor={"#FFFFFF"} boxShadow='md' fontSize={"l"} fontWeight="bold" textTransform={"uppercase"}
-                        onChange={(e)=>setNameEdit(e.target.value)} defaultValue={name} />
-                    </Flex>
-                    <Flex mt={"10px"} ms={"40px"} me={"40px"} >
-                      <Input bgColor={"#FFFFFF"} boxShadow='md' fontSize={"l"}
-                        onChange={(e)=>setEmailEdit(e.target.value)} defaultValue={email} />
-                    </Flex>
-                    <Flex mt={"10px"} ms={"40px"} me={"40px"} boxShadow='md'>
-                      <Select placeholder='Gender' defaultValue={gender} bgColor={"#FFFFFF"} fontSize={"l"} 
-                        onChange={(e)=>setGenderEdit(e.target.value)}>
-                        <option>Pria</option>
-                        <option>Wanita</option>
-                      </Select>
-                    </Flex>
-                    <Flex mt={"10px"} ms={"40px"} me={"40px"}>
-                      <Input type={"date"} bgColor={"#FFFFFF"} boxShadow='md' fontSize={"l"} placeholder="YYYY-MM-DD"
-                        onChange={(e)=>setBirthDateEdit(e.target.value)} defaultValue={birthDateFE} />
-                    </Flex>
-                    <ButtonGroup mt={"10px"} ms={"40px"} pb={"10px"}>
-                      <Button isLoading={loadingStat} class="btn-def_second2" onClick={handleEditProfile}>Submit</Button>
-                      <Button class="btn-def" onClick={handleCancel}>Cancel</Button>
-                    </ButtonGroup>
-                  </div>
-                </div>
-                <div class="col-md-4"></div>
-              </div>
-            </>
+              <img src={file} onDoubleClick={onButtonClick}
+                alt="Upload Profile Picture" style={{cursor:"pointer", width:"15%", borderRadius:"50%"}} />
+            }
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4"></div>
+          <div class="col-md-4">
+            <div class="rounded-4 mt-5" style={{backgroundColor:"#edf0f4", paddingTop:"20px"}}>
+              <Flex ms={"40px"} me={"40px"}>
+                <Input bgColor={"#FFFFFF"} boxShadow='md' fontSize={"l"} fontWeight="bold" textTransform={"uppercase"}
+                  onChange={(e)=>setNameEdit(e.target.value)} defaultValue={name} />
+              </Flex>
+              <Flex mt={"10px"} ms={"40px"} me={"40px"} >
+                <Input bgColor={"#FFFFFF"} boxShadow='md' fontSize={"l"}
+                  onChange={(e)=>setEmailEdit(e.target.value)} defaultValue={email} />
+              </Flex>
+              <Flex mt={"10px"} ms={"40px"} me={"40px"} boxShadow='md'>
+                <Select placeholder='Gender' defaultValue={gender} bgColor={"#FFFFFF"} fontSize={"l"} 
+                  onChange={(e)=>setGenderEdit(e.target.value)}>
+                  <option>Pria</option>
+                  <option>Wanita</option>
+                </Select>
+              </Flex>
+              <Flex mt={"10px"} ms={"40px"} me={"40px"}>
+                <Input type={"date"} bgColor={"#FFFFFF"} boxShadow='md' fontSize={"l"} placeholder="YYYY-MM-DD"
+                  onChange={(e)=>setBirthDateEdit(e.target.value)} defaultValue={birthDateFE} />
+              </Flex>
+              <ButtonGroup mt={"10px"} ms={"40px"} pb={"10px"}>
+                <Button isLoading={loadingStat} class="btn-def_second2" onClick={handleEditProfile}>Submit</Button>
+                <Button class="btn-def" onClick={handleCancel}>Cancel</Button>
+              </ButtonGroup>
+            </div>
+          </div>
+          <div class="col-md-4"></div>
+        </div>
+        </>
           }
           <div class="row">
             <div class="col-md-2">
@@ -558,27 +632,15 @@ const handleEditProfile=async()=>{
                           </div>
                           <div class="col-md-1"></div>
                           <div class="col-md-5">
-                          {/* <FormControl as="select" ref={provRef} onChange={(e)=>setProvId(e.current.value)}>
-                            <option value="pilih provinsi">Pilih Provinsi Tujuan</option>
-                            {getProvince.data.map((p) => (
-                              <option key={p.province_id} value={p.province_id}>
-                                {p.province}
-                              </option>
-                            ))}
-                          </FormControl> */}
                             <FormControl isRequired>
                               <FormLabel mt={8}>Provinsi</FormLabel>
-                                <Select bgColor={"#FFFFFF"} boxShadow='md' placeholder='Pilih Provinsi' onChange={(e)=>setAddProvinsiId(e.target.id)}>
+                                <Select bgColor={"#FFFFFF"} boxShadow='md' placeholder='Pilih Provinsi' onChange={(e)=>setAddProvinsiId(e.target.value)}>
                                   {getProvince.data.map((p) => (
-                                    <option key={p.province} id={p.province_id} value={p.province_id} >
+                                    <option key={p.province} id={p.province} value={p.province_id} >
                                       {p.province}
                                     </option>
                                   ))}
                                 </Select>
-                                {/* <Select bgColor={"#FFFFFF"} boxShadow='md' placeholder='Pilih Provinsi' onChange={(e)=>setAddProvinsi(e.target.value)}>
-                                  <option>DKI Jakarta</option>
-                                  <option>Bandung</option>
-                                </Select> */}
                               <FormLabel mt={4}>Kota</FormLabel>
                               {
                                 addProvinsiId > 0 ?
@@ -587,7 +649,7 @@ const handleEditProfile=async()=>{
                                   {
                                     getCity.data &&
                                     getCity.data.map((k) => (
-                                      <option key={k.city_id} value={k.city_name}>
+                                      <option key={k.city_id} value={k.city_id}>
                                         {k.city_name}
                                       </option>
                                     ))
@@ -597,13 +659,20 @@ const handleEditProfile=async()=>{
                                 <Select isDisabled bgColor={"#FFFFFF"} boxShadow='md' placeholder='Pilih Kota' >
                                 </Select>
                               }
-                                {/* <Select bgColor={"#FFFFFF"} boxShadow='md' placeholder='Pilih Kota' onChange={(e)=>setAddKota(e.target.value)}>
-                                  <option>Jakarta Timur</option>
-                                  <option>Jakarta Selatan</option>
-                                </Select> */}
+                              {
+                                addKotaId > 0 ?
+                                <>
+                                <FormLabel mt={4}>Kode Pos</FormLabel> 
+                                  <Input bgColor={"#FFFFFF"} boxShadow='md' placeholder="..." onChange={(e)=>setAddKodePos(e.target.value)}
+                                  onClick={handleCityName} />
+                                </>
+                              :
+                                <>
+                                  <FormLabel mt={4}>Kode Pos</FormLabel>
+                                    <Input isDisabled bgColor={"#FFFFFF"} boxShadow='md' placeholder="..."/>
+                                </>
+                              }
                             </FormControl>
-                            <FormLabel mt={4}>Kode Pos</FormLabel>
-                              <Input bgColor={"#FFFFFF"} boxShadow='md' placeholder="..." onChange={(e)=>setAddKodePos(e.target.value)}/>
                             <Checkbox mt={5} checked={addUtama} onChange={(e)=> {setAddUtama(e.target.checked)}}>
                               Alamat Utama
                             </Checkbox>

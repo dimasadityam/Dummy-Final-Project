@@ -6,7 +6,7 @@ const INITIAL_STATE = {
 export const userReducers = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case "LOGIN_SUCCESS":
-      console.log("Data loginAction userReducers", action.payload);
+      console.log("Data loginAction userReducers", action.payload)
       return { ...state, ...action.payload };
 
     case "LOGOUT":

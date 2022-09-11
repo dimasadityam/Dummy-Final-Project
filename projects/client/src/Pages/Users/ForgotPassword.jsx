@@ -2,12 +2,12 @@ import Axios from "axios";
 import React from "react";
 import { API_URL } from "../../helper";
 import { useDispatch } from 'react-redux'
-// import { forgotPassword } from "../redux/action/usersAction";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDisclosure, useToast } from '@chakra-ui/react';
 import { Flex, Box, Heading, Input, Image, Text, Divider, Spacer, ButtonGroup, Button, Link, extendTheme, InputGroup, InputLeftElement,
   InputRightElement, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Popover,
   PopoverTrigger, PopoverContent, PopoverHeader, PopoverArrow, PopoverCloseButton, PopoverBody, PopoverFooter } from '@chakra-ui/react';
+import VectorForgot from "../../Assets/DevImage/Forgot.png"
 import { loginAction } from "../../Redux/Actions/userActions";
 import NavbarComponent from "../../Components/Users/Navbar";
 import { useToastHook } from "../../Components/CustomToast";
@@ -21,11 +21,6 @@ const ForgotPassword=(props)=>{
   const toast = useToast()
   const [loadingStat, setLoadingStat]=React.useState(false);
   const [currentToast, newToast]=useToastHook();
-  
-
-//   React.useEffect(() => {
-//     dispatch(forgotPassword());
-// }, []);
 
 
   const handleSubmit =async()=>{
@@ -54,14 +49,12 @@ const ForgotPassword=(props)=>{
           status: 'success',
         })
         setLoadingStat(false)
-        // alert('Check Link Reset Password in Your Email')
-        // dispatch(forgotAction(res.data))
+        }
       }
-      }
-
     } catch (err) {
       newToast({
         title: 'Lupa Password Tidak Berhasil.',
+        description: 'Masukkan email yang sudah terdaftar di medhika',
         status: 'error',
       })
       setLoadingStat(false)
@@ -78,44 +71,28 @@ console.log(emailForgot)
     <Box boxShadow='md'>
       <NavbarComponent/>
     </Box>
-    <div class="container text-center pt-5 pb-5">
-    <Text class="h3">Forgot Password</Text>
+    <div class="container text-center pt-4 pb-5">
+    <Text class="h4">Forgot Password</Text>
     <br />
     <hr />
     <br />
     <div class="row">
-      <div class="col-4">
+      <div class="col-md-4 col-sm-0">
       </div>
-      <div class="col-4">
+      <div class="col-md-4 col-sm-12">
         <Box>
           <Text class="h5">Email</Text>
           <Input shadow={"md"} type="email" placeholder="Input Your Email" onChange={(e)=>setEmailForgot(e.target.value)}/>
         </Box>
         <div class="d-grid gap-2 mx-auto mt-3">
-          <Button class="btn btn-danger" isLoading={loadingStat} loadingText='Loading' 
+          <Button class="btn btn-danger" isLoading={loadingStat} 
             onClick={handleSubmit}>
               Submit
             </Button>
+            <Image src={VectorForgot} width='100%' style={{marginLeft:"10px", marginTop:"30px"}}/>
         </div>
         <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-      <div class="col-4">
+      <div class="col-md-4 col-sm-0">
       </div>
     </div>
       </div>

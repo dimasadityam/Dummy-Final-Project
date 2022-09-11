@@ -1,65 +1,69 @@
 import Axios from "axios";
 import React from "react";
+import {Bar} from "react-chartjs-2"
 import { API_URL } from "../../helper";
 import { useDispatch } from 'react-redux'
 // import { forgotPassword } from "../redux/action/usersAction";
 import { useNavigate, useParams } from "react-router-dom";
-import { Text, Image, IconButton, Flex, Box } from '@chakra-ui/react';
+import { Text, useMediaQuery, Image, IconButton, Flex, Box } from '@chakra-ui/react';
 import logo2 from "../../Assets/DevImage/LogoMedhikaPutih.png"
 import Sidebar from "../../Components/Admin/Sidebar";
 
 
 
 const Dashboard=(props)=>{
+  const [isLargerThan1280] = useMediaQuery('(min-width: 1280px)')
 
-
+  const state = {
+    labels: ['Senin', 'Selasa', 'Rabu',
+              'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
+    datasets: [
+      {
+        label: 'Penjualan Produk',
+        backgroundColor: 'rgba(75,192,192,1)',
+        borderColor: 'rgba(0,0,0,1)',
+        borderWidth: 2,
+        borderRadius:30,
+        data: [65, 59, 80, 81, 56, 30, 75]
+      }
+    ]
+  }
   return( <>
       <div class="container-fluid" >
         <div class="row">
-          <div class="col-3">
+        {
+          isLargerThan1280 ?
+            <>
+              <div class="col-md-3 col-sm-5">
+              <Sidebar />
+            </div>
+            <div class="col-md-9 col-sm-8">
+              <div class="row">
+                <div class="mt-3">
+                  <Text class="h1b">Dashboard Admin Medhika</Text>
+                  <div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            </>
+        :
+          <>
+            <div class="col-4">
             <Sidebar />
           </div>
-          <div class="col-9">
+          <div class="col-8">
             <div class="row">
-              <div class="text-center mt-3">
+              <div class="mt-3">
                 <Text class="h1b">Dashboard Admin Medhika</Text>
+
               </div>
             </div>
           </div>
+          </>
+        }
         </div>
       </div>
-      {/* <Box>
-        <Flex>
-          <Text class="h1b">Dashboard Admin</Text>
-        </Flex>
-      </Box> */}
-      {/* <div class="row">
-        <div class="col-2" style={{backgroundColor:"#DE1B51"}}>
-          <div class="d-flex justify-content-center mt-5">
-            <Image src={logo2} width='130px'/>
-          </div>
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-        </div>
-        <div class="col-10" style={{backgroundColor:"#f6f8fc"}}>
-        </div>
-      </div> */}
   </>
   )
 }

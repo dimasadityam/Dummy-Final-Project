@@ -203,6 +203,28 @@ code {
   background-color: var(--colorSeven) !important;
   /* border-radius: 0.3rem; */
 }
+
+.btn-def_second3 {
+  cursor: pointer;
+  font-family: var(--defaultFont);
+  font-weight: 600 !important;
+  font-size: 16px !important;
+  /* border-width: 2px;
+  border-color: var(--colorSix) !important; */
+  color: var(--colorOne);
+  background-color: var(--colorSix) !important;
+  border-radius: 5px;
+  height: 35px;
+  width: 300px;
+  /* border-radius: 0.3rem; */
+}
+
+.btn-def_second3:hover {
+  border-color: var(--colorOne) !important;
+  color: var(--colorOne);
+  background-color: var(--colorSeven) !important;
+  /* border-radius: 0.3rem; */
+}
 .btn-def_second2 {
   cursor: pointer;
   font-family: var(--defaultFont);
@@ -214,7 +236,7 @@ code {
   background-color: var(--colorSix) !important;
   border-radius: 5px;
   height: 35px;
-  width: 120px;
+  width: 300px;
   /* border-radius: 0.3rem; */
 }
 
@@ -271,5 +293,47 @@ nav ul li a:hover {
   border-left-color: #586BB1;
 }
 
+@media (max-width:768px){
+  .sidebarAdmin {
+    position: relative;
+    width: 140px;
+    height: 100%;
+    left: 0;
+    background: var(--colorSix);
+  }
+  
+  nav ul{
+    background: var(--colorSix);
+    height: 100%;
+    width: 100%;
+    list-style: none;
+  }
+  
+  nav ul li {
+    line-height: 60px;
+    border-bottom: 1px solid #586BB1;
+  }
+  
+  nav ul li a {
+    color:#FFFFFF;
+    text-decoration: none;
+    font-size: 12px;
+    padding-left: 40px;
+    font-weight: 500;
+    display: block;
+    width: 100%;
+    
+  }
+  nav ul li.active a{
+    color:#FFFFFF;
+    background: #9B1339;
+    border-left-color: #586BB1;
+  }
+  
+  nav ul li a:hover {
+    color:#FFFFFF;
+    background: #9B1339;
+    border-left-color: #586BB1;
+  }
 
-
+}

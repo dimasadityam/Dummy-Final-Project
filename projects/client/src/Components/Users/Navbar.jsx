@@ -1,6 +1,5 @@
 import React from "react";
 import Axios from "axios";
-// import "../style/landingPage.css";
 import logo from "../../Assets/DevImage/LogoMedhika.png";
 import { Flex, Box, Heading, Input, Image, Spacer, ButtonGroup, Button, Link, Menu, MenuButton,
   MenuGroup, MenuList, MenuDivider, MenuItem, Text, useMediaQuery, IconButton} from '@chakra-ui/react';
@@ -10,7 +9,6 @@ import { useDisclosure, useToast } from '@chakra-ui/react';
 import { logoutAction } from "../../Redux/Actions/userActions";
 import Modal from "../../Components/Users/ModalLogin";
 import { API_URL } from "../../helper";
-// import {  } from 'react-icons/io'
 import { IoCart, IoCloseCircle, IoMenuOutline } from 'react-icons/io5';
 import { FaUser, FaUserSlash, FaUserCircle } from 'react-icons/fa';
 import { loginAction } from "../../Redux/Actions/userActions";
@@ -22,8 +20,8 @@ const NavbarComponent = (props) => {
   const dispatch = useDispatch();
   const toast = useToast()
   const [show, setShow] = React.useState(false);
-  const [currentToast, newToast]=useToastHook();
   const [isLargerThan1280] = useMediaQuery('(min-width: 1280px)')
+  const [currentToast, newToast]=useToastHook();
   const {isVerified, users, role, name, profilePicture, token}=useSelector((state) => {
     return {
         isVerified:state.userReducers.isVerified,
@@ -47,15 +45,11 @@ const NavbarComponent = (props) => {
           if (res.data.token){
               localStorage.setItem("tokenIdUser", res.data.token)
               // dispatch(loginAction(res.data))
-              // setOpenToast(!openToast)
-              // setToastMsg(`Resend Verification Success,
-              // Please check your email`)
               newToast({
                 title: 'Resend Verifikasi Berhasil.',
                 description:'Verifikasi akun anda dengan link yang ada di email',
                 status: 'success',
               })
-              // alert('Resend verification success ✅')
           }
       } catch (err) {
         newToast({
@@ -93,6 +87,7 @@ const NavbarComponent = (props) => {
     }
   }
 
+    // console.log("SHOW Navb", show)
     console.log("S T A T U S Navb", isVerified)
     console.log("profilePicture", profilePicture)
   return (
@@ -181,7 +176,7 @@ const NavbarComponent = (props) => {
                           </MenuGroup>
                           <MenuDivider />
                           <MenuGroup title='Transaction'>
-                            <MenuItem>Product List</MenuItem>
+                            <MenuItem onClick={()=> navigate("/productlist")}>Product List</MenuItem>
                             <MenuItem>Transaction List</MenuItem>
                           </MenuGroup>
                           <MenuDivider />

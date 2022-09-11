@@ -1,10 +1,8 @@
 import Axios from "axios";
 import React from "react";
 import { API_URL } from "../../helper";
-// import { Button, FormGroup, Input, InputGroup, Label, InputGroupText } from "reactstrap";
-import { Button, Text, Box, Input, InputGroup, InputRightElement } from "@chakra-ui/react";
+import { Button, Text, Box, Input, InputGroup, InputRightElement, Image } from "@chakra-ui/react";
 import { useDispatch, useSelector } from 'react-redux';
-// import { resetPassword } from "../redux/action/usersAction";
 import { useNavigate, useParams } from "react-router-dom";
 import { IoIosWarning } from "react-icons/io";
 import { useDisclosure, useToast } from '@chakra-ui/react';
@@ -12,6 +10,7 @@ import { loginAction } from "../../Redux/Actions/userActions";
 import { logoutAction } from "../../Redux/Actions/userActions";
 import NavbarComponent from "../../Components/Users/Navbar";
 import { useToastHook } from "../../Components/CustomToast";
+import VectorChangePassword from "../../Assets/DevImage/Reset.png"
 
 const ResetPassword=(props)=>{
   const dispatch = useDispatch();
@@ -27,11 +26,43 @@ const ResetPassword=(props)=>{
   const toast = useToast()
   const [loadingStat, setLoadingStat]=React.useState(false);
   const [currentToast, newToast]=useToastHook();
+  const [blacklist, setBlacklist] = React.useState(false);
   const { token }=useSelector((state) => {
     return {
         token:state.userReducers.token
       }
     })
+
+    React.useEffect(() => {
+      getTokens();
+  }, []);
+
+  const getTokens= async ()=>{
+    try {
+      console.log("getTokens jalan");
+      console.log("params",params.token);
+      if (params.token) {
+        let res = await Axios.post(`${API_URL}/users/getTokens`, {
+          token: params.token
+        }, {
+          headers: {
+            'Authorization': `Bearer ${params.token}`
+          }
+        })
+        // memeriksa adanya data user atau tidak
+        console.log("RES.DATA.TOKEN verified", res.data)
+        if (res.data.message == "token valid") {
+          //
+          setBlacklist(true)
+        } else {
+          setBlacklist(false)
+  
+        }
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   console.log("password", password)
   console.log("konfirmasi password", confirmPassword)
@@ -48,74 +79,50 @@ const ResetPassword=(props)=>{
 
   const handleReset =async()=>{
     try {
-      // setDisable(!disable)
       setLoadingStat(true);
       checkStrongPassword();
       if (password=="" || confirmPassword==""){
-        // alert("Fill in all form")
         newToast({
           title: 'Reset Password Tidak Berhasil.',
           description: 'Mohon isi password dan konfirmasi password.',
           status: 'error',
         })
         setLoadingStat(false)
-        // setOpenToast(!openToast)
-        // setToastMsg(`Form Cannot Be Empty,
-        // Fill In All Form!`)
-        // console.log(username, email, password, confPassword)
       } else{
         if (password!=confirmPassword){
-          // setOpenToast(!openToast)
-          // setToastMsg(`Password Not Match`)
           newToast({
             title: 'Reset Password Tidak Berhasil.',
             description: 'Konfirmasi password tidak sesuai dengan password.',
             status: 'error',
           })
           setLoadingStat(false)
-          // alert("Password not match")
         } else {
+          console.log("reset password jalannnn")
           let res = await Axios.patch(`${API_URL}/users/reset`, { newPassword: password },
           {
             headers: {
               'Authorization': `Bearer ${params.token}`
             }
           })
-          // console.log("res.data registerUser", res.data)
           if (res.data) {
-            // setOpenToast(!openToast)
-            // setToastMsg(`Registration success,
-            // Verified your account with link verification in your email`)
-            // console.log("res.data FE", res.data)
-            // console.log("res.data.token FE", res.data.token)
-            // localStorage.setItem("tokenIdUser", res.data.token)
             dispatch(logoutAction())
             newToast({
               title: 'Reset Password Berhasil.',
               description: 'Silahkan login dengan password baru anda.',
               status: 'success',
             })
-            // alert(`registration success,
-            // verified your account with link verification in email`)
-            // console.log("token2 regis", token)
-            // setDisable(!disable)
             setLoadingStat(false)
             navigate("/")
           }
         } 
       }    
     } catch (err) {
-      // setOpenToast(!openToast)
-      // setToastMsg(`${error.response.data.message}`)
       newToast({
         title: 'Reset Password Tidak Berhasil.',
         description: 'Coba lakukan kembali dengan data yang benar',
         status: 'error',
       })
       setLoadingStat(false)
-      // alert(err.response.data.message)
-      // console.log(disable)
-      // setDisable(!disable)
   }
   }
 
@@ -128,8 +135,6 @@ const ResetPassword=(props)=>{
     } else {
       setPasswordLength(false)
     }
-    // console.log("cek password.length",inForm.password.length)
-    // console.log(inForm.password)
   }
 
   const checkStrongPassword =()=>{
@@ -141,10 +146,6 @@ const ResetPassword=(props)=>{
           description: 'Disarankan untuk merubah password yang kuat. setidaknya memiliki 8 huruf yang terdiri dari huruf kapital dan angka',
           status: 'warning',
         })
-        // alert("Weak password")
-        // setOpenToast(!openToast)
-        // setToastMsg(`Weak Password !
-        // plaase create strong password.`)
   }
 }
 
@@ -176,7 +177,7 @@ const checkNumbers=()=>{
       <NavbarComponent/>
     </Box>
   {
-    token == params.token ?
+    blacklist == true ?
     <>
       <div className="container text-center pt-5 pb-5">
         <h4 className="h4-register">Create New Password</h4>
@@ -184,9 +185,9 @@ const checkNumbers=()=>{
         <hr />
         <br />
         <div className="row">
-          <div className="col-4">
+          <div className="col-md-4 col-sm-0">
           </div>
-          <div className="col-4">
+          <div className="col-md-4 col-sm-12">
           <Box marginTop={"20px"}>
                 <Text class="h6b">Password</Text>
                   <InputGroup size='md'>
@@ -225,27 +226,13 @@ const checkNumbers=()=>{
                     </InputRightElement>
                   </InputGroup>
               </Box>
-                <Button isLoading={loadingStat} loadingText='Loading' style={{marginTop:"25px"}} class="btn-def_second" onClick={handleReset}>Reset Password</Button>
+                <Button isLoading={loadingStat} style={{marginTop:"25px"}} class="btn-def_second" onClick={handleReset}>Reset Password</Button>
+                <Image src={VectorChangePassword} width='100%' style={{ marginTop:"40px"}}/>
           </div>
-          <div className="col-4">
+          <div className="col-md-4 col-sm-0">
           </div>
         </div>
         </div>
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
     </>
     : 
     <div class="container text-center">
@@ -258,7 +245,6 @@ const checkNumbers=()=>{
           <IoIosWarning class="mt-5" size={"150px"} style={{color:"#DE1B51"}} />
         </div>
         <Text class="h5">Invalid Token</Text>
-        {/* onClick={() => navigate("/")} */}
         <Button class="btn-def_second mt-3 h5b" onClick={() => navigate("/")}>Close this page</Button>
       </div>
       <div class="col-4">

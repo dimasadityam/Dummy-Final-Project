@@ -1,8 +1,9 @@
-const userControllers = require('./userControllers');
+const userControllers = require("./userControllers");
+const adminControllers = require("./adminControllers");
 const addressControllers = require('./addressControllers')
 const rajaOngkirControllers = require('./rajaOngkirControllers')
-const productControllers = require('./productControllers')
 
 module.exports = {
-  userControllers, addressControllers, rajaOngkirControllers, productControllers
-}
+  userControllers, addressControllers, rajaOngkirControllers,
+  adminControllers
+};

@@ -1,9 +1,5 @@
 import Axios from "axios";
 import React from "react";
-import { API_URL } from "../../helper";
-import { useDispatch } from 'react-redux'
-// import { forgotPassword } from "../redux/action/usersAction";
-import { useNavigate, useParams } from "react-router-dom";
 import { Text } from '@chakra-ui/react';
 
 

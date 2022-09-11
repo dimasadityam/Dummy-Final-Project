@@ -1,7 +1,7 @@
 import Axios from "axios";
 import React from "react";
 import { API_URL } from "../../helper";
-import { Button, Text, Box, Input, InputGroup, InputRightElement } from "@chakra-ui/react";
+import { Button, Text, Box, Input, InputGroup, InputRightElement, Image } from "@chakra-ui/react";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from "react-router-dom";
 import { IoIosWarning } from "react-icons/io";
@@ -9,6 +9,7 @@ import { useDisclosure, useToast } from '@chakra-ui/react';
 import { loginAction, logoutAction } from "../../Redux/Actions/userActions";
 import NavbarComponent from "../../Components/Users/Navbar";
 import { useToastHook } from "../../Components/CustomToast";
+import VectorChangePassword from "../../Assets/DevImage/Reset.png"
 
 
 const ChangePassword=(props)=>{
@@ -65,7 +66,6 @@ const ChangePassword=(props)=>{
             status: 'error',
           })
           setLoadingStat(false);
-          // alert("Password not match")
         } else {
           let token = localStorage.getItem("tokenIdUser");
           let res = await Axios.patch(`${API_URL}/users/change`, {
@@ -139,8 +139,6 @@ const checkNumbers=()=>{
 }
 
   return( <>
-  {/* {
-    token == params.token ? */}
     <Box
       w='100%'
       h='100%'
@@ -156,16 +154,16 @@ const checkNumbers=()=>{
         <hr />
         <br />
         <div className="row">
-          <div className="col-4">
+          <div className="col-md-4 col-sm-0">
           </div>
-          <div className="col-4">
+          <div className="col-md-4 col-sm-12">
           <Box marginTop={"20px"}>
                 <Text class="h6b">Old Password</Text>
                   <InputGroup size='md'>
                     <Input bgColor={"#FFFFFF"} boxShadow='md'
                       pr='4.5rem'
                       type={show ? 'text' : 'password'}
-                      placeholder='Old Password' onChange={(e) =>  { handleInput(e.target.value, "password"); setOldPassword(e.target.value)}}
+                      placeholder='Old Password' onChange={(e) => setOldPassword(e.target.value)}
                     />
                     <InputRightElement width='4.5rem'>
                       <Button h='1.75rem' size='sm' onClick={handleClick}>
@@ -212,49 +210,18 @@ const checkNumbers=()=>{
                     </InputRightElement>
                   </InputGroup>
               </Box>
-                <Button isLoading={loadingStat} loadingText='Loading' style={{marginTop:"25px"}}
+                <Button isLoading={loadingStat} style={{marginTop:"25px"}}
                   class="btn-def_second" onClick={handleSubmit}>Submit</Button>
+              <Image src={VectorChangePassword} width='100%' style={{marginLeft:"10px", marginBottom:"5px"}}/>
           </div>
-          <div className="col-4">
+          <div className="col-md-4 col-sm-0">
           </div>
         </div>
         </div>
         <br />
         <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
+
     </>
-    : 
-    <div class="container text-center">
-    <div class="row mt-5">
-      <div class="col-4">
-
-      </div>
-      <div class="col-4">
-        <div class="d-flex justify-content-center">
-          <IoIosWarning class="mt-5" size={"150px"} style={{color:"#DE1B51"}} />
-        </div>
-        <Text class="h5">Invalid Token</Text>
-        {/* onClick={() => navigate("/")} */}
-        <Button class="btn-def_second mt-3 h5b" onClick={() => navigate("/")}>Close this page</Button>
-      </div>
-      <div class="col-4">
-
-      </div>
-    </div>
-  </div>
-  {/* } */}
   </Box>
   </>
   )
